@@ -80,7 +80,7 @@ Xây dựng một nền tảng e-commerce đơn giản với các chức năng:
 
 ### Bước 1: Clone dự án
 ```bash
-git clone https://github.com/quocsanggl2004/22640841-TranQuocSang_EProject.git
+git clone https://github.com/foxxiee04/22640841-TranQuocSang_EProject.git
 cd EProject-Phase-1
 ```
 
@@ -504,8 +504,8 @@ EProject-Phase-1/
 
 **Tên:** Trần Quốc Sáng  
 **MSSV:** 22640841  
-**GitHub:** https://github.com/quocsanggl2004/22640841-TranQuocSang_EProject  
-**Docker Hub:** https://hub.docker.com/u/quocsanggl2004
+**GitHub:** https://github.com/foxxiee04/22640841-TranQuocSang_EProject  
+**Docker Hub:** https://hub.docker.com/u/foxxiee04
 
 ---
 
