@@ -1,0 +1,32 @@
+{
+  "name": "eproject-microservices",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --timeout 20000 --recursive --exclude '**/node_modules/**' '**/*.test.js' --exit",
+    "start": "npm run start:all",
+    "start:all": "concurrently \"npm run start:gateway\" \"npm run start:auth\" \"npm run start:product\" \"npm run start:order\"",
+    "start:gateway": "cd api-gateway && npm start",
+    "start:auth": "cd auth && npm start",
+    "start:product": "cd product && npm start",
+    "start:order": "cd order && npm start",
+    "dev": "npm run dev:all",
+    "dev:all": "concurrently \"npm run dev:gateway\" \"npm run dev:auth\" \"npm run dev:product\" \"npm run dev:order\"",
+    "dev:gateway": "cd api-gateway && npm run dev",
+    "dev:auth": "cd auth && npm run dev",
+    "dev:product": "cd product && npm run dev",
+    "dev:order": "cd order && npm run dev",
+    "install:all": "npm install && cd api-gateway && npm install && cd ../auth && npm install && cd ../product && npm install && cd ../order && npm install",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "docker:build": "docker-compose build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "concurrently": "^7.6.0"
+  }
+}

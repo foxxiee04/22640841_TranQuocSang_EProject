@@ -1,0 +1,126 @@
+version: '3.8'
+
+services:
+  # MongoDB
+  mongodb:
+    image: mongo:8.0.13
+    container_name: eproject2-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongodb_data2:/data/db
+    networks:
+      - eproject2-network
+
+  # RabbitMQ
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: eproject2-rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"    # AMQP port
+      - "15672:15672"  # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: password
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - rabbitmq_data2:/var/lib/rabbitmq
+    networks:
+      - eproject2-network
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway2
+    restart: unless-stopped
+    ports:
+      - "3003:3003"
+    environment:
+      - API_GATEWAY_PORT=3003
+    depends_on:
+      - auth
+      - product
+      - order
+    networks:
+      - eproject2-network
+
+  # Auth Service
+  auth:
+    build:
+      context: ./auth
+      dockerfile: Dockerfile
+    container_name: auth2
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - AUTH_SERVICE_PORT=3000
+      - MONGODB_AUTH_URI=mongodb://admin:password@mongodb:27017/auth_db?authSource=admin
+      - JWT_SECRET=EProject2025SecretKey
+    depends_on:
+      - mongodb
+    networks:
+      - eproject2-network
+
+  # Product Service
+  product:
+    build:
+      context: ./product
+      dockerfile: Dockerfile
+    container_name: product2
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - PRODUCT_SERVICE_PORT=3001
+      - MONGODB_PRODUCT_URI=mongodb://admin:password@mongodb:27017/product_db?authSource=admin
+      - JWT_SECRET=EProject2025SecretKey
+      - RABBITMQ_URI=amqp://admin:password@rabbitmq:5672
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+    networks:
+      - eproject2-network
+
+  # Order Service
+  order:
+    build:
+      context: ./order
+      dockerfile: Dockerfile
+    container_name: order2
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    environment:
+      - ORDER_SERVICE_PORT=3002
+      - MONGODB_ORDER_URI=mongodb://admin:password@mongodb:27017/order_db?authSource=admin
+      - JWT_SECRET=EProject2025SecretKey
+      - RABBITMQ_URI=amqp://admin:password@rabbitmq:5672
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+    networks:
+      - eproject2-network
+
+volumes:
+  mongodb_data2:
+  rabbitmq_data2:
+
+networks:
+  eproject2-network:
+    driver: bridge
