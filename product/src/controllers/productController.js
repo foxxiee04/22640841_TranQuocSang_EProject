@@ -110,6 +110,16 @@ class ProductController {
     }
   }
 
+  async getProductById (req, res, next) {
+    try {
+      const token = req.headers.authorization;
+      const product = await Product.findById(req.params.id);
+      res.status(200).json(product);
+    } catch {
+
+    }
+  }
+
 
   async updateProduct(req, res, next) {
     try {
